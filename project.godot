@@ -11,7 +11,12 @@ config_version=4
 [application]
 
 config/name="Fighting arcade server"
+run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+Server="*res://Server.gd"
 
 [physics]
 
