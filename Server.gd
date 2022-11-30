@@ -36,10 +36,11 @@ func _discon_jogador(player_id):
 
 # <sync> é outra keyword bem utilizada para sincronizar os clientes com o servidor.
 # Geralmente é utilizada em conjunto da função rpc(...)
-remote func _get_player_pos(var motion, var direction):
+remote func _get_player_pos(var motion, var direction, var node_id):
 	
 	motion.x = direction * SPEED
 	
 	var sender_id = get_tree().get_rpc_sender_id()
-	rpc_id(sender_id, "_get_player_pos", motion, direction)
-	print('Enviando [', motion, '] para o cliente [', sender_id,']')
+	
+	rpc_id(sender_id, "_set_player_pos", motion, node_id)
+	print('Enviando [', motion, '] para o cliente [', sender_id,'] para o node [', node_id,']')
