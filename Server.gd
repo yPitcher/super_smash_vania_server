@@ -6,7 +6,7 @@ var port : int = 42069
 #Número máximo de conexões simultâneas
 var max_jogadores : int = 2
 
-var players = {}
+var players = []
 var self_data = { id="", position=Vector2(300,60) }
 
 const SPEED = 300
@@ -24,9 +24,16 @@ func StartServer():
 	
 	
 func _conecta_jogador(player_id):
+	players.append( player_id )
 	print(str(player_id), ' conectou')
+	if players.size() == 2:
+		#chamar a função pra instanciar os jogadores na tela
+		print("Total de 2 players, enviando requisições...")
+		rpc_id(players[0], "_instance_players", players)
+		rpc_id(players[1], "_instance_players", players)
 	
 func _discon_jogador(player_id):
+	players.remove( player_id )
 	print(str(player_id), ' desconectou')
 	
 	
@@ -42,5 +49,13 @@ remote func _get_player_pos(var motion, var direction, var node_id):
 	
 	var sender_id = get_tree().get_rpc_sender_id()
 	
-	rpc_id(sender_id, "_set_player_pos", motion, node_id)
-	print('Enviando [', motion, '] para o cliente [', sender_id,'] para o node [', node_id,']')
+	if sender_id == players[0]:
+		print('Enviando [', motion, '] para o cliente [', players[0],'] para o node [', node_id,']')
+		rpc_id(players[0], "_set_player_pos", motion, node_id, 1, sender_id)
+		print('Enviando [', motion, '] para o cliente [', players[1],'] para o node [', node_id,']')
+		rpc_id(players[1], "_set_player_pos", motion, node_id, 2, sender_id)
+	elif sender_id == players[1]:
+		print('Enviando [', motion, '] para o cliente [', players[0],'] para o node [', node_id,']')
+		rpc_id(players[0], "_set_player_pos", motion, node_id, 1, sender_id)
+		print('Enviando [', motion, '] para o cliente [', players[1],'] para o node [', node_id,']')
+		rpc_id(players[1], "_set_player_pos", motion, node_id, 2, sender_id)
